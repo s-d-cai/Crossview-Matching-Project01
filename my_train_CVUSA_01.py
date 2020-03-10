@@ -349,7 +349,7 @@ def RankTest(net_test, best_rank_result):
 criterion = HER_TriLoss_OR_UnNorm()
 
 
-bestRankResult = 0.1 #
+bestRankResult = 0.8 # initialization of best result (randomly setting, 0< num <1)
 
 # loop over the dataset
 N_loop = 100
