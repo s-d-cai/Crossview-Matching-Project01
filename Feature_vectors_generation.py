@@ -286,7 +286,7 @@ FeatVecGen(net, model_name)
 ###
 
 ### Siam-FCANet 34 ###
-
+"""
 model_name = 'SFCANet34'
 
 net = SiamFCANet18_CVUSA()
@@ -296,5 +296,5 @@ weight_path = 'weights/FCANET34/'
 net.load_state_dict(torch.load(weight_path+'SFCANet_34.pth'))
 
 FeatVecGen(net, model_name)
-
+"""
 ###
