@@ -256,7 +256,7 @@ def RankTest(net_test, best_rank_result):
     my_data = ImageDataForExam(filenames_query, filenames_examing)
                                      
     mini_batch = 8
-    testloader = DataLoader(my_data, batch_size=mini_batch, shuffle=False, num_workers=10)
+    testloader = DataLoader(my_data, batch_size=mini_batch, shuffle=False, num_workers=8)
     
     N_data = len(filenames_query)
     vec_len = 4096
@@ -414,7 +414,7 @@ for epoch in range(0,N_loop):
     triplet_data = Triplet_ImageData(up_root, filenames_grd, filenames_sat)
     
     ### feeding A and P into train loader
-    trainloader = DataLoader(triplet_data, batch_size=mini_batch, shuffle=False, num_workers=10)
+    trainloader = DataLoader(triplet_data, batch_size=mini_batch, shuffle=False, num_workers=8)
     
     for Loop, TripletData in enumerate(trainloader, 0):  
         # get the inputs
