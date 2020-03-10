@@ -349,7 +349,7 @@ def RankTest(net_test, best_rank_result):
 criterion = HER_TriLoss_OR_UnNorm()
 
 
-bestRankResult = 0.9828905898244035 # current best, Siam-FCANet18
+bestRankResult = 0.1 #
 
 # loop over the dataset
 N_loop = 100
