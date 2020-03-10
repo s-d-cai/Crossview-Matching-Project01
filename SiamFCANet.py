@@ -1,3 +1,9 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+@author: Michael (S. Cai)
+"""
+
 import math
 
 import torch
@@ -8,7 +14,7 @@ import torch.nn.functional as F
 #from graphviz import Digraph
         
 ###****** FCAM: Feature Context-Based Attention Module ******###
-# using multi-scale receptive fields for analyzing contextual info, inspired by CRN #
+# using multi-scale receptive fields for analyzing contextual info, inspired by CRN and CBAM #
 class MulFCAM(nn.Module):
     def __init__(self, channel, rate_reduct=16):
         super(MulFCAM, self).__init__()
@@ -394,3 +400,4 @@ def SiamFCANet34_CVUSA( **kwargs):
     return model
 
 ####################################
+
