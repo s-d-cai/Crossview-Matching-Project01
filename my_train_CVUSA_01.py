@@ -238,7 +238,7 @@ mini_batch = 12
 ### a space to restore loss value
 loss_vec = np.zeros(600000, dtype=np.float32)
 
-########################### ranking test ############################
+########################### ranking test (partial test set) ############################
 def RankTest(net_test, best_rank_result):
     ### net evaluation state
     net_test.eval()
