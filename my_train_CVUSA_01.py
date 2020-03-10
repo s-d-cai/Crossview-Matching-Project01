@@ -14,8 +14,7 @@ import torch.optim as optim
 from torchvision import datasets, models, transforms
 from torch.utils.data import Dataset, DataLoader
 
-from SiamFCANet import SiamFCANet18_CVUSA, SiamFCANet34_CVUSA # without VLAD layer
-from SiamFCANet_VLAD import SiamFCANet18VLAD_CVUSA, SiamFCANet34VLAD_CVUSA # using VLAD layer
+from SiamFCANet import SiamFCANet18_CVUSA, SiamFCANet34_CVUSA
 
 from losses_for_training import SoftMargin_TriLoss_OR_UnNorm
 from losses_for_training import HER_TriLoss_OR_UnNorm
@@ -73,7 +72,7 @@ def IsSubString(SubStrList, Str):
     return flag
    
 
-################# triplet data preparing ####################
+################# triplet data preparation ####################
 
 class Triplet_ImageData(Dataset):
     ###label_list 0 1  A means Anchor and P means positive
@@ -147,9 +146,9 @@ class Triplet_ImageData(Dataset):
     
         return trans_img_G, trans_img_S, angle_tensor, angle
 
-####### triplet data feeding preparation done
+#########################
 
-##### for testing #####
+##### for test #####
 
 class ImageDataForExam(Dataset):
     ###label_list 0 1  A means Anchor and P means positive
@@ -180,7 +179,7 @@ class ImageDataForExam(Dataset):
         
         ######################################
         
-        ###### for examing data
+        ###### for exam data
         data_names_sat = os.path.join('', self.image_names_sat[idx])
         image_sat = Image.open(data_names_sat)
         
@@ -196,7 +195,7 @@ class ImageDataForExam(Dataset):
         
         return trans_img_G, trans_img_S
 
-################# testing data processing done ##############
+#################
 
 
 ### load data
@@ -206,7 +205,7 @@ trainIdxList = data.id_idx_list
 testList = data.id_test_list
 testIdxList = data.id_test_idx_list
     
-######################################## data preparation ######################################
+########################################
 up_root = 'dataset/CVUSA/'
 
 ####################### model assignment #######################
@@ -218,7 +217,7 @@ net_pre = SiamFCANet18_CVUSA() ### pre model
 weight_path = 'weights/FCANET18/'
 net_pre.load_state_dict(torch.load(weight_path+'Model_best.pth'))
 
-net_pre_dict = net_pre.state_dict() ### given params to a object
+net_pre_dict = net_pre.state_dict() ### 
 #################
 
 net = SiamFCANet18_CVUSA()
@@ -226,7 +225,7 @@ net.cuda()
 
 net_dict = net.state_dict()
 
-### update net.state_dict() for fine-tune training
+### update net.state_dict() for fine-tune
 net_pre_dict = {k: v for k, v in net_pre_dict.items() if k in net_dict}
 net_dict.update(net_pre_dict)
 net.load_state_dict(net_dict)
@@ -234,12 +233,9 @@ net.load_state_dict(net_dict)
 save_path = 'weights/FCANET18/'
 ###########################
 
-###########################
-
-#mini_batch = 9
 mini_batch = 12
 
-### assign a vec to restore loss value
+### a space to restore loss value
 loss_vec = np.zeros(600000, dtype=np.float32)
 
 ########################### ranking test ############################
@@ -264,17 +260,16 @@ def RankTest(net_test, best_rank_result):
     
     N_data = len(filenames_query)
     vec_len = 4096
-    #vec_len = 1024
     
-    ### N_data mini_batch
+    ### N_data % mini_batch
     nail = N_data % mini_batch
-    ### N_data mini_batch
+    ### N_data // mini_batch
     max_i = N_data // mini_batch
-    ### creat a space for restoring the features
+    ### creat a space for restoring features
     query_vec = np.zeros([N_data,vec_len], dtype=np.float32)
     examing_vec = np.zeros([N_data,vec_len], dtype=np.float32)
     
-    ### feature extract
+    ### feature extraction
     for i, data in enumerate(testloader, 0):
         data_query, data_examing = data
         data_query, data_examing = Variable(data_query).cuda(), Variable(data_examing).cuda()
@@ -296,7 +291,7 @@ def RankTest(net_test, best_rank_result):
             
         print(i)
     
-    print('vec produce done')
+    print('Vec Completed')
         
     ### load vectors
     query_vectors = query_vec
@@ -305,8 +300,14 @@ def RankTest(net_test, best_rank_result):
     
     N_data = query_vectors.shape[0]
     
-    ### keep vector's lentgh
+    ### metrics for evaluation (top 1%)
     length = int(N_data * 0.01) + 1
+    
+    ### top 1
+    #length = 1
+        
+    ### top 10
+    #length = 10
     
     ###
     correct_num = 0
@@ -335,7 +336,7 @@ def RankTest(net_test, best_rank_result):
     
     net_test.train()
     
-    ### restore the best params
+    ### restore the best model weights
     if(result > best_rank_result):
         torch.save(net_test.state_dict(), save_path + 'Model_best.pth')
         np.save(save_path + 'best_result.npy', result)
@@ -348,21 +349,23 @@ def RankTest(net_test, best_rank_result):
 criterion = HER_TriLoss_OR_UnNorm()
 
 
-bestRankResult = 0.9828905898244035 # current best, Siam-FCANET18
-# loop over the dataset multiple times
-for epoch in range(0,50):
+bestRankResult = 0.9828905898244035 # current best, Siam-FCANet18
+
+# loop over the dataset
+N_loop = 100
+for epoch in range(0,N_loop):
     
     ### save model
 
-    if(epoch>30):
-        compNum = epoch % 1
+    if(epoch>0):
+        compNum = epoch % 5
         print('taking snapshot ...')
         torch.save(net.state_dict(), save_path + 'model_' + np.str(compNum) + '.pth')
-        np.save(save_path + 'loss_vec' + np.str(epoch) + 'epoch.npy', loss_vec)
+        #np.save(save_path + 'loss_vec' + np.str(epoch) + 'epoch.npy', loss_vec)
     
 
     ### ranking test
-    if(epoch>-1):
+    if(epoch>50):
         current = RankTest(net, bestRankResult)
         if(current>bestRankResult):
             bestRankResult = current
@@ -377,14 +380,13 @@ for epoch in range(0,50):
     
 
     net.train()
-
-    #base_lr = 0.001
+    
+    ###
     base_lr = 0.00005
-    base_lr = base_lr*((1.0-float(epoch)/30.0)**(1.0))
+    base_lr = base_lr*( (1.0-float(epoch)/float(N_loop))**(1.0) )
     
     ### 
     optimizer = optim.SGD(net.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0005)
-    #optimizer = optim.Adam(net.parameters(), lr=base_lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.0005)
     optimizer.zero_grad()
     
     ################# txt file and input data preparation ###############
@@ -397,10 +399,10 @@ for epoch in range(0,50):
         grd_list_shuffled.append(rawList[1])
         sat_list_shuffled.append(rawList[0])
     
-    ############ Anchor and Positive list which will be shuffled during training ############
+    ############ Exemplar list will be shuffled in training ############
     num_files = mini_batch * (len(grd_list_shuffled) // mini_batch)
     
-    ### repeated number of samples
+    ### number to control length of data
     repNum = 1
     
     num_files = repNum*num_files
