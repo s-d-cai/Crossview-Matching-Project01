@@ -1,5 +1,9 @@
 #### #Ground-to-Aerial Image Geo-Localization Experiments
 #### #Siam-FCANet18 and Siam-FCANet34
+#### #Evaluation on CVUSA 
+#### Recall@ Top 1%: 98.289% (Net18), 98.345% (Net34)
+#### Recall@ Top-10: 84.410% (Net18), 83.667% (Net34)
+#### Recall@ Top-1:  45.058% (Net18), 42.863% (Net34)
 #### #Files for experiments on CVUSA dataset
 #### #Python 2.7 (3.6 is also working) and Pytorch 0.4.0 version
 #### #Link to trained models (and some generated feature vectors): 
