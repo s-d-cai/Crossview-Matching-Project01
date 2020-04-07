@@ -310,7 +310,6 @@ def RankTest(net_test, best_rank_result):
     correct_num = 0
     error_num = 0
 
-
     dist_E = (examing_vec**2).sum(1).reshape(N_data,1)
     dist_Q = (query_vec**2).sum(1).reshape(N_data,1)
 
