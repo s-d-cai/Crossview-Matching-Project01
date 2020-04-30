@@ -11,3 +11,5 @@
 ###### Recall@ Top 1%: 98.289% (Net18), 98.345% (Net34)
 ###### Recall@ Top-10: 84.410% (Net18), 83.667% (Net34)
 ###### Recall@ Top-1:  45.058% (Net18), 42.863% (Net34)
+
+###### (Better results on CVUSA are achieved with shorter embedding vectors and will be released soon)
