@@ -218,7 +218,7 @@ up_root = '/mnt/data/wwq/Crossview_Dataset/CVUSA/dataset/CVUSA/'
 
 net_pre = SiamFCANet18_VH() ### pre model 
 
-weight_path = 'weights/FCANET18_ntest/FT/'
+weight_path = 'weights/FCANET18/Init/'
 net_pre.load_state_dict(torch.load(weight_path+'SFCANet_18_VH.pth'))
 
 net_pre_dict = net_pre.state_dict() ### given params to a object
@@ -234,7 +234,7 @@ net_pre_dict = {k: v for k, v in net_pre_dict.items() if k in net_dict}
 net_dict.update(net_pre_dict)
 net.load_state_dict(net_dict)
 
-save_path = 'weights/FCANET18_ntest/'
+save_path = 'weights/FCANET18/'
 ###########################
 
 ###########################
@@ -309,7 +309,8 @@ def RankTest(net_test, best_rank_result):
     N_data = query_vectors.shape[0]
     
     ### keep vector's lentgh
-    length = int(N_data * 0.01) + 1
+    length = int(N_data * 0.01) + 1 # top 1%
+    #length = 1 # top-1
     
     ###
     correct_num = 0
@@ -350,7 +351,7 @@ def RankTest(net_test, best_rank_result):
     
 ###### learning criterion assignment #######
 
-criterion = HER_TriLoss_OR_UnNorm()
+criterion = HER_TriLoss_OR_UnNorm() 
 
 
 bestRankResult = 0.98457 # current best, Siam-FCANET18
@@ -383,7 +384,7 @@ for epoch in range(0,100):
 
     net.train()
 
-    #base_lr = 0.001
+    #base_lr = 0.0001
     base_lr = 0.00005
     base_lr = base_lr*((1.0-float(epoch)/100.0)**(1.0))
     
