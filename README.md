@@ -8,8 +8,5 @@
 ###### or https://pan.baidu.com/s/1p7HkOO7NLUVJeZ-3dzgpKQ (code: 4fzy)
 
 ###### #Evaluation on CVUSA 
-###### Recall@ Top 1%: 98.289% (Net18), 98.345% (Net34)
-###### Recall@ Top-10: 84.410% (Net18), 83.667% (Net34)
-###### Recall@ Top-1:  45.058% (Net18), 42.863% (Net34)
-
-###### (Better results on CVUSA are achieved with shorter embedding vectors and they will be released soon)
+###### Recall@ Top 1%: 98.46% (Net18), 98.345% (Net34)
+###### Recall@ Top-1:  49.10% (Net18), 42.863% (Net34)
