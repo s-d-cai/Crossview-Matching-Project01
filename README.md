@@ -5,7 +5,7 @@
 ###### # Link to trained models (and some generated feature vectors): 
 ###### # Link to download CVUSA dataset: 
 ###### https://www.dropbox.com/sh/qamkvep0nclwekf/AAC2TqW6n5rM_0qTRaqOeqzKa?dl=0  
-###### or https://pan.baidu.com/s/1p7HkOO7NLUVJeZ-3dzgpKQ (code: 4fzy)
+###### or https://pan.baidu.com/s/1ZRv-912C7SMaK7IcR8iGhA (code: x1g9)
 
 ###### # For training on CVUSA, Please directly run "train_CVUSA_01.py" with corrected paths to dataset and the model. Models trained by VH dataset are recommended to be used as initialization. 
 ###### # For evaluation, two ways are both working: (1) run "train_CVUSA_01.py" with setting (epoch>-1) in the "### ranking test" sub-section, (2) run "Feature_vectors_generation.py" to get the features and then run "RankingTest.py" or "RankingTest_ForBigMat.py" to output the results at corresponding metrics (the parameter "length" is used to control the metrics, i.e., recall at top-k or top k%)
