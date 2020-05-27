@@ -179,12 +179,24 @@ class HER_TriLoss_OR_UnNorm(nn.Module):
         #self.margin = 20.25*margin
         
     def forward(self, sat_global, grd_global, marginCal, angle_label, angle_pred, theta1, theta2):
+        # scaling fector, sat_global, grd_global, marginCal are 3 vars can be scaled
+        # recommed settings: 1.0 for un-normalized features and 5.0 for normalized features
+        alpha = 1.0
+        sat_global = alpha * sat_global
+        grd_global = alpha * grd_global
         
-        self.margin = marginCal
+        self.margin = (alpha**2) * marginCal
         
-        distance_negative = torch.autograd.Variable(torch.zeros(grd_global.shape[0],grd_global.shape[0])).cuda()
-        for l in range(grd_global.size()[0]):
-            distance_negative[l] = ( grd_global[l].repeat(grd_global.shape[0],1) - sat_global ).pow(2).sum(1)
+        length_v = grd_global.size()[0]
+        
+        #distance_negative = torch.autograd.Variable(torch.zeros(length_v,length_v)).cuda()
+        #for l in range(length_v):
+            #distance_negative[l] = ( grd_global[l].repeat(length_v,1) - sat_global ).pow(2).sum(1)
+        
+        dist_sat = (sat_global.pow(2)).sum(1).reshape(length_v,1).t()
+        dist_grd = (grd_global.pow(2)).sum(1).reshape(length_v,1)
+        
+        distance_negative = dist_grd + dist_sat - 2 * torch.matmul(grd_global, sat_global.t())        
         
         distance_positive = torch.diagonal(distance_negative)
         
@@ -212,9 +224,6 @@ class HER_TriLoss_OR_UnNorm(nn.Module):
         
         # diagonal elements need to be neglected (set to zero)
         w_mask = w_mask - torch.diag(torch.diagonal(w_mask))
-        
-        # scaling fector - alpha (recommended setting is 1.0)
-        alpha = 1.0
         
         # main loss computing
         losses = w_mask * torch.log(1.0 + torch.exp( alpha*(distance_positive.repeat(grd_global.size()[0],1).t() - distance_negative)))
