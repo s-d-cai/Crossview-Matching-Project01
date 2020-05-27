@@ -208,12 +208,12 @@ class SiamFCANet_Base_CVUSA(nn.Module):
         self.AttendPool = nn.MaxPool2d(kernel_size=2,stride=2,padding=1) # 7*39 need to pad before maxpool
         self.AttendPool_p = nn.MaxPool2d(kernel_size=2,stride=2,padding=0)
 
-        self.featVec_CVUSA = nn.Linear(512*4*20, 4096)
-        self.featVec_CVUSA_p = nn.Linear(512*8*8, 4096)
+        self.featVec_CVUSA = nn.Linear(512*4*20, 1024)
+        self.featVec_CVUSA_p = nn.Linear(512*8*8, 1024)
         
         
         ### layers for orientation regression
-        self.angle_fc8_CVUSA = nn.Linear(2*4096, 100)
+        self.angle_fc8_CVUSA = nn.Linear(2*1024, 100)
         self.angle_fc9_CVUSA = nn.Linear(100, 2)
 
         
