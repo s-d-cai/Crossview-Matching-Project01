@@ -4,7 +4,7 @@
 ###### # Python 2.7 (3.6 and 3.7 are also working) and Pytorch 0.4.0 or later versions
 ###### # Link to trained models (and some generated feature vectors): 
 ###### # Link to download CVUSA dataset: 
-###### https://www.dropbox.com/sh/qamkvep0nclwekf/AAC2TqW6n5rM_0qTRaqOeqzKa?dl=0  
+###### # https://www.dropbox.com/sh/yi3kkygzbw7hd2o/AABIQfnvi7UVjCTDf0jjHFsJa?dl=0
 ###### or https://pan.baidu.com/s/1ZRv-912C7SMaK7IcR8iGhA (code: x1g9)
 
 ###### # For training on CVUSA, Please directly run "train_CVUSA_01.py" with corrected paths to dataset and the model. Models trained by VH dataset are recommended to be used as initialization. 
@@ -12,5 +12,5 @@
 ###### # Please note that: when applying HER-loss to train un-normalized models (i.e., embedding features are not normalized), sometimes the trainig process may crash with "NaN" occurs in the very beginning, because values of some variables in the loss function are getting too big under the current initializations of some learning layers or the learning rate is too big. If this situation happens, please re-run the "train_CVUSA_01.py". BTW, the new version of HER-loss is robust to this case and it will be uploaded later...
 
 ###### #Evaluation on CVUSA 
-###### Recall@ Top 1%: 98.46% (Net18), 98.345% (Net34 old model)
-###### Recall@ Top-1:  49.46% (Net18), 42.863% (Net34 old model)
+###### Recall@ Top 1%: 98.457% (Net18), 98.345% (Net34 old model)
+###### Recall@ Top-1:  49.459% (Net18), 42.863% (Net34 old model)
