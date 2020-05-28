@@ -168,7 +168,7 @@ class SoftMargin_TriLoss_OR_UnNorm(nn.Module):
         return losses_merge.mean(), distance_positive.mean(), distance_negative.mean() 
 
     
-# for un-normalized features
+############ HER version 01
 class HER_TriLoss_OR_UnNorm(nn.Module):
     """
     HER_TriLoss_OR_UnNorm (Hard Exemplar Reweighting Triplet Loss)
@@ -176,11 +176,10 @@ class HER_TriLoss_OR_UnNorm(nn.Module):
     ### init
     def __init__(self, margin=10.0):
         super(HER_TriLoss_OR_UnNorm, self).__init__()
-        #self.margin = 20.25*margin
-        
+          
     def forward(self, sat_global, grd_global, marginCal, angle_label, angle_pred, theta1, theta2):
         # scaling fector, sat_global, grd_global, marginCal are 3 vars can be scaled
-        # recommed settings: 1.0 for un-normalized features and 5.0 for normalized features
+        # recommended settings: 1.0 for un-normalized features and 5.0 for normalized features
         alpha = 1.0
         sat_global = alpha * sat_global
         grd_global = alpha * grd_global
@@ -226,7 +225,7 @@ class HER_TriLoss_OR_UnNorm(nn.Module):
         w_mask = w_mask - torch.diag(torch.diagonal(w_mask))
         
         # main loss computing
-        losses = w_mask * torch.log(1.0 + torch.exp( alpha*(distance_positive.repeat(grd_global.size()[0],1).t() - distance_negative)))
+        losses = w_mask * torch.log(1.0 + torch.exp( (distance_positive.repeat(grd_global.size()[0],1).t() - distance_negative)))
                 
         ### orientation regression loss (angle_label = [sin(angle), cos(angle)])
         
