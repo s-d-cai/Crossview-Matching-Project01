@@ -231,7 +231,7 @@ def FeatVecGen(net_test, model_name):
     testloader = DataLoader(my_data, batch_size=mini_batch, shuffle=False, num_workers=8)
     
     N_data = len(filenames_query)
-    vec_len = 4096
+    vec_len = 1024
     
     ### N_data % mini_batch 
     nail = N_data % mini_batch
@@ -289,7 +289,7 @@ FeatVecGen(net, model_name)
 """
 model_name = 'SFCANet34'
 
-net = SiamFCANet18_CVUSA()
+net = SiamFCANet34_CVUSA()
 net.cuda()
 
 weight_path = 'weights/FCANET34/'
