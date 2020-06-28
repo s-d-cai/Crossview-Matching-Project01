@@ -56,10 +56,10 @@ class WeightedSoftMarginLoss(nn.Module):
             loss = (loss_g2s + loss_s2g) / 2.0
             #loss = loss_g2s
             
-            pos_dist_avg = pos_dist.mean()
-            nega_dist_avg = dist_array.mean()
-        
-            return loss, pos_dist_avg, nega_dist_avg.sum()   
+        pos_dist_avg = pos_dist.mean()
+        nega_dist_avg = dist_array.mean()
+
+        return loss, pos_dist_avg, nega_dist_avg.sum()   
     
 
 ### OR version
