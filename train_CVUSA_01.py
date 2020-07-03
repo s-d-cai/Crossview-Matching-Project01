@@ -280,7 +280,7 @@ def RankTest(net_test, best_rank_result):
     ### feature extract
     for i, data in enumerate(testloader, 0):
         data_query, data_examing = data
-        data_query, data_examing = Variable(data_query).cuda(), Variable(data_examing).cuda()
+        data_query, data_examing = data_query.cuda(), data_examing.cuda()
         
         outputs_query, _ = net_test.forward_SV(data_query)
         outputs_examing, _ = net_test.forward_OH(data_examing)
