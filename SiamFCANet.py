@@ -21,7 +21,7 @@ class MulFCAM(nn.Module):
         ### for channel attention ###
         ###
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.max_pool = nn.AdaptiveAvgPool2d(1)
+        self.max_pool = nn.AdaptiveMaxPool2d(1)
         ###
         self.conv_down = nn.Conv2d(channel, channel // rate_reduct, kernel_size=1, stride=1, bias=False)
         self.relu = nn.ReLU(inplace=True)
