@@ -2,9 +2,6 @@
 ###### # Siam-FCANet18 and Siam-FCANet34
 ###### # Files for experiments on CVUSA dataset
 ###### # Python 2.7 (3.6 and 3.7 are also working) and Pytorch 0.4.0 or later versions
-###### # Link to trained models: 
-###### # https://www.dropbox.com/sh/yi3kkygzbw7hd2o/AABIQfnvi7UVjCTDf0jjHFsJa?dl=0
-###### or https://pan.baidu.com/s/1ZRv-912C7SMaK7IcR8iGhA (code: x1g9)
 ###### # The CVUSA dataset can be accessed from this link: https://github.com/viibridges/crossnet
 
 ###### # For training on CVUSA, Please directly run "train_CVUSA_01.py" with corrected paths to dataset and the model. Models trained by VH dataset are recommended to be used as initialization. 
