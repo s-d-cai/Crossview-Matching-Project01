@@ -309,6 +309,8 @@ class SiamFCANet_Base(nn.Module):
         angleVecHalf = x
         ###########
         
+        x = F.normalize(x, p=2, dim=1)
+        
         #x = self.featvec(x)
         
         ### embedding a l2-norm layer to form a normalized feature vectors
@@ -349,6 +351,8 @@ class SiamFCANet_Base(nn.Module):
         angleVecHalf = x
         ###########
         
+        x = F.normalize(x, p=2, dim=1)
+        
         #x = self.featvec_p(x)
         
         ### embedding a l2-norm layer to form a normalized feature vectors
@@ -381,6 +385,8 @@ class SiamFCANet_Base(nn.Module):
         angle_ORvec = self.angle_fc9(angle_ORvec) ### vec length for each instance is 2 (sin(angle) and cos(angle))
         #################
         
+        angle_ORvec = F.normalize(angle_ORvec, p=2, dim=1)
+        
         return features_A, features_P, features_N, angle_ORvec
         
     ### forward siam
@@ -399,6 +405,8 @@ class SiamFCANet_Base(nn.Module):
         angle_ORvec = self.angle_relu(angle_ORvec)
         angle_ORvec = self.angle_fc9(angle_ORvec) ### vec length for each instance is 2 (sin(angle) and cos(angle))
         #################
+        
+        angle_ORvec = F.normalize(angle_ORvec, p=2, dim=1)
         
         return global_grd, global_sat, angle_ORvec
         #################
