@@ -308,7 +308,7 @@ class SiamFCANet_Base_CVUSA(nn.Module):
         angleVecHalf = x
         ###########
         
-        #x = F.normalize(x, p=2, dim=1)
+        x = F.normalize(x, p=2, dim=1)
 
         return x, angleVecHalf
     
@@ -337,7 +337,7 @@ class SiamFCANet_Base_CVUSA(nn.Module):
         angleVecHalf = x
         ###########
 
-        #x = F.normalize(x, p=2, dim=1)        
+        x = F.normalize(x, p=2, dim=1)        
 
         return x, angleVecHalf
     
@@ -359,7 +359,7 @@ class SiamFCANet_Base_CVUSA(nn.Module):
         angle_ORvec = self.angle_fc9(angle_ORvec) ### vec length for each instance is 2 (sin(angle) and cos(angle))
         #################
         
-        #angle_ORvec = F.normalize(angle_ORvec, p=2, dim=1)
+        angle_ORvec = F.normalize(angle_ORvec, p=2, dim=1)
         
         return global_grd, global_sat, angle_ORvec
     
@@ -381,7 +381,7 @@ class SiamFCANet_Base_CVUSA(nn.Module):
         angle_ORvec = self.angle_fc9(angle_ORvec) ### vec length for each instance is 2 (sin(angle) and cos(angle))
         #################
         
-        #angle_ORvec = F.normalize(angle_ORvec, p=2, dim=1)
+        angle_ORvec = F.normalize(angle_ORvec, p=2, dim=1)
         
         return features_A, features_P, features_N, angle_ORvec
 
