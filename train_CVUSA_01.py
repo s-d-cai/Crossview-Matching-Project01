@@ -16,7 +16,7 @@ import torch.optim as optim
 from torchvision import datasets, models, transforms
 from torch.utils.data import Dataset, DataLoader
 
-from SiamFCANet import SiamFCANet18_CVUSA, SiamFCANet34_CVUSA # without VLAD layer
+from SiamFCANet import SiamFCANet18_CVUSA, SiamFCANet34_CVUSA
 from SiamFCANet_VH import SiamFCANet18_VH, SiamFCANet34_VH
 #from SiamFCANet_VLAD import SiamFCANet18VLAD_CVUSA, SiamFCANet34VLAD_CVUSA # using VLAD layer
 
@@ -42,9 +42,13 @@ from numpy.random import uniform as uniform
 ### in python2 list type data need copy.copy() method to realize .copy() as in numpy array
 import copy
 
+##############################
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+Is_Parallel = True
+
 ########################
-torch.backends.cudnn.benchmark = True # use cudnn
-########################
+torch.backends.cudnn.benchmark = True  # use cudnn
+##############
 
 # scan the files
 def GetFileList(FindPath, FlagStr=[]):
@@ -210,22 +214,22 @@ testList = data.id_test_list
 testIdxList = data.id_test_idx_list
     
 ######################################## data preparation ######################################
-up_root = '/mnt/data/wwq/Crossview_Dataset/CVUSA/dataset/CVUSA/'
+up_root = '.../CVUSA/' # path to the CVUSA dataset
 
 ####################### model assignment #######################
 
 #################
 
-net_pre = SiamFCANet18_VH() ### pre model 
-
-weight_path = 'weights/FCANET18/Init/'
+net_pre = SiamFCANet18_VH() ### model init (using weights trained by VH) 
+weight_path = 'weights/FCANET18/init/'
 net_pre.load_state_dict(torch.load(weight_path+'SFCANet_18_VH.pth'))
+
 
 net_pre_dict = net_pre.state_dict() ### given params to a object
 #################
 
 net = SiamFCANet18_CVUSA()
-net.cuda()
+
 
 net_dict = net.state_dict()
 
@@ -234,13 +238,23 @@ net_pre_dict = {k: v for k, v in net_pre_dict.items() if k in net_dict}
 net_dict.update(net_pre_dict)
 net.load_state_dict(net_dict)
 
+
+### data parallel
+if Is_Parallel:
+    net = nn.DataParallel(net)
+
+### cuda
+net.cuda()
+
+
 save_path = 'weights/FCANET18/'
 ###########################
 
-###########################
-
-#mini_batch = 9
-mini_batch = 12
+if Is_Parallel:
+    mini_batch = 48
+else:
+    mini_batch = 12  
+    
 
 ### assign a vec to restore loss value
 loss_vec = np.zeros(600000, dtype=np.float32)
@@ -262,10 +276,15 @@ def RankTest(net_test, best_rank_result):
     
     my_data = ImageDataForExam(filenames_query, filenames_examing)
                                      
-    mini_batch = 8
-    testloader = DataLoader(my_data, batch_size=mini_batch, shuffle=False, num_workers=10)
+    if Is_Parallel:
+        mini_batch = 24
+    else:
+        mini_batch = 8
+        
+    testloader = DataLoader(my_data, batch_size=mini_batch, shuffle=False, num_workers=24)
     
     N_data = len(filenames_query)
+    
     #vec_len = 4096
     vec_len = 1024
     
@@ -282,8 +301,10 @@ def RankTest(net_test, best_rank_result):
         data_query, data_examing = data
         data_query, data_examing = data_query.cuda(), data_examing.cuda()
         
-        outputs_query, _ = net_test.forward_SV(data_query)
-        outputs_examing, _ = net_test.forward_OH(data_examing)
+        #outputs_query, _ = net_test.forward_SV(data_query)
+        #outputs_examing, _ = net_test.forward_OH(data_examing)
+        
+        outputs_query, outputs_examing, _ = net_test.forward(data_query, data_examing)
         
         ###### feature vector feeding
         if(i<max_i):
@@ -301,16 +322,13 @@ def RankTest(net_test, best_rank_result):
     
     print('vec produce done')
         
-    ### load vectors
-    query_vectors = query_vec
-    
-    repo_vectors = examing_vec
-    
-    N_data = query_vectors.shape[0]
+    ### load vectors    
+    N_data = query_vec.shape[0]
     
     ### keep vector's lentgh
-    length = int(N_data * 0.01) + 1 # top 1%
-    #length = 1 # top-1
+    #length = int(N_data * 0.01) + 1
+    
+    length = 1
     
     ###
     correct_num = 0
@@ -343,7 +361,7 @@ def RankTest(net_test, best_rank_result):
     
     ### restore the best params
     if(result > best_rank_result):
-        #torch.save(net_test.state_dict(), save_path + 'Model_best.pth')
+        torch.save(net_test.state_dict(), save_path + 'Model_best.pth')
         np.save(save_path + 'best_result.npy', result)
     
     return result
@@ -351,32 +369,37 @@ def RankTest(net_test, best_rank_result):
     
 ###### learning criterion assignment #######
 
-criterion = HER_TriLoss_OR_UnNorm() 
+criterion = HER_TriLoss_OR_UnNorm()
 
 
-bestRankResult = 0.98457 # current best, Siam-FCANET18
+bestRankResult = 0.0 # current best, Siam-FCANET18
 # loop over the dataset multiple times
-for epoch in range(0,100):
+for epoch in range(0, 100):
     
     ### save model
-
-    if(epoch>30):
-        compNum = epoch % 1
+    
+    if(epoch>0):
+        compNum = epoch % 100
         print('taking snapshot ...')
-        #torch.save(net.state_dict(), save_path + 'model_' + np.str(compNum) + '.pth')
+        if Is_Parallel:
+            torch.save(net.module.state_dict(), save_path + 'model_' + np.str(compNum) + '.pth')
+        else:
+            torch.save(net.state_dict(), save_path + 'model_' + np.str(compNum) + '.pth')
         #np.save(save_path + 'loss_vec' + np.str(epoch) + 'epoch.npy', loss_vec)
     
 
     ### ranking test
-    if(epoch>50):
+    if(epoch>0):
         current = RankTest(net, bestRankResult)
         if(current>bestRankResult):
             bestRankResult = current
+        
+        np.save(save_path + 'model_' + np.str(epoch) + '_top1.npy', current)
             
     
-    if(epoch==0):
-        theta1 = 2.0
-        theta2 = 1.0
+    if(epoch<50):
+        theta1 = 1.0
+        theta2 = 0.5
     else:
         theta1 = 5.0
         theta2 = 2.5
@@ -384,38 +407,18 @@ for epoch in range(0,100):
 
     net.train()
 
-    #base_lr = 0.0001
-    base_lr = 0.00005
+    #base_lr = 0
+    base_lr = 5e-05
     base_lr = base_lr*((1.0-float(epoch)/100.0)**(1.0))
     
+    print(base_lr)
+    
     ### 
-    optimizer = optim.SGD(net.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0005)
-    """
-    optimizer = optim.SGD([
-            {'params': net.pre1_conv1.parameters(), 'lr': base_lr},
-            {'params': net.pre2_conv1.parameters(), 'lr': base_lr},
-            {'params': net.pre1_norm1.parameters(), 'lr': base_lr},
-            {'params': net.pre2_norm1.parameters(), 'lr': base_lr},
-            {'params': net.pre1_conv2.parameters(), 'lr': base_lr},
-            {'params': net.pre2_conv2.parameters(), 'lr': base_lr},
-            {'params': net.pre1_norm2.parameters(), 'lr': base_lr},
-            {'params': net.pre2_norm2.parameters(), 'lr': base_lr},
-            {'params': net.pre1_conv3.parameters(), 'lr': base_lr},
-            {'params': net.pre2_conv3.parameters(), 'lr': base_lr},
-            {'params': net.pre1_conv4.parameters(), 'lr': base_lr},
-            {'params': net.pre2_conv4.parameters(), 'lr': base_lr},
-            {'params': net.pre1_conv5.parameters(), 'lr': base_lr},
-            {'params': net.pre2_conv5.parameters(), 'lr': base_lr},            
-            {'params': net.pre1_fc7.parameters(), 'lr': base_lr},
-            {'params': net.pre2_fc7.parameters(), 'lr': base_lr},            
-            {'params': net.pre1_fc8.parameters(), 'lr': base_lr},
-            {'params': net.pre2_fc8.parameters(), 'lr': base_lr},            
-            {'params': net.angle_fc8.parameters(), 'lr': 10*base_lr},
-            {'params': net.angle_fc9.parameters(), 'lr': 10*base_lr},            
-            {'params': net.fc6.parameters(), 'lr': base_lr},
-            {'params': net.fc6_p.parameters(), 'lr': base_lr},  
-        ], lr=base_lr, momentum=0.9, weight_decay=0.00005)
-    """
+    optimizer = optim.SGD(net.module.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0005)
+    
+    #optimizer = optim.Adam(net.module.parameters(), lr=base_lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.00005) 
+  
+    
     optimizer.zero_grad()
     
     ################# txt file and input data preparation ###############
@@ -443,7 +446,7 @@ for epoch in range(0,100):
     triplet_data = Triplet_ImageData(up_root, filenames_grd, filenames_sat)
     
     ### feeding A and P into train loader
-    trainloader = DataLoader(triplet_data, batch_size=mini_batch, shuffle=False, num_workers=10)
+    trainloader = DataLoader(triplet_data, batch_size=mini_batch, shuffle=False, num_workers=24)
     
     for Loop, TripletData in enumerate(trainloader, 0):  
         # get the inputs
