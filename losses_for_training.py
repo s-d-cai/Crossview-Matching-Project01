@@ -180,7 +180,7 @@ class HER_TriLoss_OR_UnNorm(nn.Module):
     def forward(self, sat_global, grd_global, marginCal, angle_label, angle_pred, theta1, theta2):
         # scaling fector, sat_global, grd_global, marginCal are 3 vars can be scaled
         # recommended settings: 1.0 for un-normalized features and 5.0 for normalized features
-        alpha = 1.0
+        alpha = 5.0
         sat_global = alpha * sat_global
         grd_global = alpha * grd_global
         
